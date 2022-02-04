@@ -7,7 +7,7 @@ export default function Song(props) {
         <Text style={styles.songText}>{props.index + 1}</Text>
         <Image style={styles.songImage} source={{uri: props.item.album.images[0].url}} />
         <View style={styles.songTitleArtist}>
-          <Text style={{color: Colors.white}}>{props.item.name}</Text>
+          <Text style={{color: Colors.white}} numberOfLines={1}>{props.item.name}</Text>
           <Text style={{color: Colors.gray}}>{props.item.artists[0].name}</Text>
         </View>
         <View style={styles.songAlbum}>
