@@ -1,9 +1,11 @@
-import { StyleSheet, Text, SafeAreaView } from "react-native";
+import { StyleSheet, Text, SafeAreaView, Pressable, View, Image, FlatList } from "react-native";
 import { useState, useEffect } from "react";
 import { ResponseType, useAuthRequest } from "expo-auth-session";
 import { myTopTracks, albumTracks } from "./utils/apiOptions";
 import { REDIRECT_URI, SCOPES, CLIENT_ID, ALBUM_ID } from "./utils/constants";
+import millisToMinutesAndSeconds from "./utils/millisToMinuteSeconds";
 import Colors from "./Themes/colors"
+import Song from "./Song"
 
 // Endpoints for authorizing with Spotify
 const discovery = {
@@ -31,25 +33,54 @@ export default function App() {
     if (response?.type === "success") {
       const { access_token } = response.params;
       setToken(access_token);
-    }
+    } 
   }, [response]);
 
   useEffect(() => {
     if (token) {
-      // TODO: Select which option you want: Top Tracks or Album Tracks
-
       // Comment out the one you are not using
-      // myTopTracks(setTracks, token);
-      albumTracks(ALBUM_ID, setTracks, token);
+      myTopTracks(setTracks, token);
+      //albumTracks(ALBUM_ID, setTracks, token);
     }
   }, [token]);
 
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* TODO */}
-      <Text style={{ color: "white" }}>Welcome to Assignment 3 - Spotify</Text>
-    </SafeAreaView>
-  );
+  const renderSong = ({item, index}) => {
+    let duration = millisToMinutesAndSeconds(item.duration_ms);    
+    return (
+      <Song item={item} index={index} duration={duration}></Song>
+    );
+  };
+
+  if (token) {
+    return(
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Image source={require("./assets/spotify-logo.png")} style={styles.connectButtonLogo} />
+          <Text style={styles.headerText}>My Top Tracks</Text>
+        </View>
+        <View style={{ flex: 1}}>
+          <FlatList
+            data={tracks}
+            renderItem={renderSong}
+            keyExtractor={(item) => `${item.id}`}
+          />
+        </View>
+      </SafeAreaView>
+    );
+  } else {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Pressable onPress={promptAsync}>
+          <View style={styles.connectButton}>
+            <Image source={require("./assets/spotify-logo.png")} style={styles.connectButtonLogo} />
+            <Text style={styles.connectButtonText}>CONNECT WITH SPOTIFY</Text>
+          </View>
+        </Pressable>
+      </SafeAreaView>
+    );
+  }
+  
+  
 }
 
 const styles = StyleSheet.create({
@@ -58,5 +89,41 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flex: 1
-  }
+  },
+  connectButton: {
+    backgroundColor: Colors.spotify,
+    width: "55%",
+    padding: 8,
+    borderRadius: 99999,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  connectButtonText: {
+    textAlign: "center",
+    color: Colors.white,
+    flex: 5,
+  },
+  connectButtonLogo: {
+    resizeMode: "contain",
+    height: "100%",
+    flex: 1
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  headerText: {
+    flex: 2,
+    color: Colors.white,
+    fontSize: 28,
+    fontWeight: "bold",
+  },
+  headerLogo: {
+    resizeMode: "contain",
+    height: "100%",
+    flex: 1,
+  },
 });
