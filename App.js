@@ -1,4 +1,7 @@
 import { StyleSheet, Text, SafeAreaView, Pressable, View, Image, FlatList } from "react-native";
+import { WebView } from "react-native-webview";
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { useState, useEffect } from "react";
 import { ResponseType, useAuthRequest } from "expo-auth-session";
 import { myTopTracks, albumTracks } from "./utils/apiOptions";
@@ -44,15 +47,31 @@ export default function App() {
     }
   }, [token]);
 
-  const renderSong = ({item, index}) => {
-    let duration = millisToMinutesAndSeconds(item.duration_ms);    
-    return (
-      <Song item={item} index={index} duration={duration}></Song>
-    );
-  };
+  const Stack = createStackNavigator();
 
-  if (token) {
-    return(
+  function SongDetails ({ navigation, route }) {
+    const { externalURL } = route.params;
+    return (
+      <WebView source={{ uri: externalURL }}/>
+    );
+  }
+
+  function SongPreview({ navigation, route }) {
+    const { previewURL } = route.params;
+    return (
+      <WebView source={{ uri: previewURL }}/>
+    );
+  }
+
+  function HomeScreen({ navigation }) {
+    const renderSong = ({item, index}) => {
+      let duration = millisToMinutesAndSeconds(item.duration_ms);  
+      return (
+        <Song item={item} index={index} duration={duration} navigation={navigation}></Song>
+      );
+    };
+
+    return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <Image source={require("./assets/spotify-logo.png")} style={styles.connectButtonLogo} />
@@ -66,6 +85,36 @@ export default function App() {
           />
         </View>
       </SafeAreaView>
+    ); 
+  }
+
+  if (token) {
+    return(
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}} />
+          <Stack.Screen name="Song Preview" component={SongPreview} 
+            options={{
+              headerStyle:{
+                backgroundColor: Colors.background,
+              },
+              headerTitleStyle: {
+                color: Colors.white
+              }
+            }
+            }/>
+          <Stack.Screen name="Song Details" component={SongDetails} 
+            options={{
+              headerStyle:{
+                backgroundColor: Colors.background,
+              },
+              headerTitleStyle: {
+                color: Colors.white
+              }
+            }
+            }/>
+        </Stack.Navigator>
+      </NavigationContainer>
     );
   } else {
     return (
