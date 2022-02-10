@@ -15,18 +15,18 @@ export default function Song(props) {
           <Image style={styles.songImage} source={{uri: props.item.album.images[0].url}} />
         </Pressable>
         <Pressable flex={2} justifyContent={"center"} onPress={() => props.navigation.navigate("Song Details", {externalURL: props.item.external_urls.spotify})}>
-          <View style={styles.songTitleArtist}>
+          <View style={styles.songTitleArtist} justifyContent={"center"}>
             <Text style={{color: Colors.white}} numberOfLines={1}>{props.item.name}</Text>
             <Text style={{color: Colors.gray}}>{props.item.artists[0].name}</Text>
           </View>
         </Pressable>
         <Pressable flex={2} justifyContent={"center"} onPress={() => props.navigation.navigate("Song Details", {externalURL: props.item.external_urls.spotify})}>
-          <View style={styles.songAlbum}>
+          <View style={styles.songAlbum} justifyContent={"center"}>
             <Text style={{color: Colors.white}} numberOfLines={1}>{props.item.album.name}</Text>
           </View>
         </Pressable>
         <Pressable flex={0.75} alignItems={"center"} justifyContent={"center"} onPress={() => props.navigation.navigate("Song Details", {externalURL: props.item.external_urls.spotify})}>
-          <View style={styles.songDuration}>
+          <View style={styles.songDuration} justifyContent={"center"}>
             <Text style={{color: Colors.white}}>{props.duration}</Text>
           </View>
         </Pressable>
